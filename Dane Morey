@@ -1,0 +1,36 @@
+## These functions allow for quicker calculation of a matrix inverse.
+## By caching the inverse of a created matrix with makeCacheMatrix,
+## the inverse of the matrix is then found with cacheSolve. If the 
+## inverse of the matrix has already been found, cacheSolve simply
+## looks up the already cached value rather than solving again.
+
+## This function creates an object that caches the matrix and its inverse.
+
+makeCacheMatrix <- function(A = matrix()) {
+    I <- NULL ## Whenever function is called, clears I.
+    setA <- function(y) { ## When setA is called, rewriting A with input y.
+        A <<- y
+        I <<- NULL
+    }
+    getA <- function() as.matrix(A) ## When getA is called, returning value of A as a matrix.
+    setI <- function(A_inv) I <<- A_inv ## When setI is called, writes inputed A_inv to I.
+    getI <- function() I ## When getI is called, returning the current value of I.
+    list(setA = setA, getA = getA, setI = setI, getI = getI) ## Combining 4 functions in a list.
+}
+
+
+## This function computes the inverse of the special object from makeCacheMatrix.
+## It retrieves the value of the inverse if already cached, or calculates the inverse from scratch, if not.
+## The function ultimately returns a matrix that is the inverse of 'x'.
+
+cacheSolve <- function(A, ...) {
+    I <- A$getI() ## Assigning the current cached inverse to I (could be NULL if none cached).
+    if(!identical(I,NULL)) { ## Checking if cached inverse is not NULL.
+        message("obtaining cached data for inverse") ## Notifying data is from cached.
+        return(I) ## Returning the cached value of I rather than calculating inverse.
+    }
+    A$setA(A$getA()) ## Setting the cached value of the matrix to current matrix.
+    I <- solve(A$getA(), ...) ## Solving for the inverse of the matrix and assigning it to I.
+    A$setI(I) ## Copying the inverse I to the cached data.
+    I ## Returning the inverse I of the matrix A.
+}
